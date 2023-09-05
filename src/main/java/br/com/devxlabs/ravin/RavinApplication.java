@@ -9,5 +9,4 @@ public class RavinApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RavinApplication.class, args);
 	}
-
 }
