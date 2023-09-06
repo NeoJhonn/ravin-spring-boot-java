@@ -1,5 +1,7 @@
 package br.com.devxlabs.ravin.services;
 
+
+import static br.com.devxlabs.ravin.consts.ExceptionConsts.*;
 import br.com.devxlabs.ravin.models.dtos.ProductDTO;
 import br.com.devxlabs.ravin.models.entities.Product;
 import br.com.devxlabs.ravin.repositories.ProductRepository;
@@ -32,11 +34,18 @@ public class ProductService {// todas as validações e regras de negócio devem
 
     public ProductDTO findById(long id) {
         Optional<Product> optional = productRepository.findById(id);
-        return  null;
+        ProductDTO productDTO = null;
+
+        // se dentro do optinal  tem um product
+        if (optional.isPresent()) {
+            productDTO = mapper.map(optional.get(), ProductDTO.class);
+        }
+
+        return  productDTO;
     }
 
     public void deleteById(long id) {
-        System.out.println("Produto excluido com sucesso!");
+        productRepository.deleteById(id);
     }
 
     public List<ProductDTO> search(String nome,
@@ -56,4 +65,28 @@ public class ProductService {// todas as validações e regras de negócio devem
 
         return null;
     }
+
+    public Long create(ProductDTO productDTO) throws Exception {
+        return save(productDTO);
+    }
+
+    public long update(ProductDTO productDTO) throws Exception {
+        return save(productDTO);
+    }
+
+    public Long save(ProductDTO productDTO) throws Exception {
+        try {
+            if (productDTO.getCostPrice() > productDTO.getSalePrice()) {
+                throw  new Exception(PRODUCT_COST_PRICE_GRATHER_THEN_SALE_PRICE);
+            }
+
+
+            Product product = mapper.map(productDTO, Product.class);
+            Product created = productRepository.save(product);
+            return created.getId();
+        } catch (Exception e) {
+            throw new Exception(PRODUCT_INSERT_ERROR);
+        }
+    }
+
 }

@@ -1,8 +1,10 @@
 package br.com.devxlabs.ravin.controllers;
 
 import br.com.devxlabs.ravin.models.dtos.ProductDTO;
+import br.com.devxlabs.ravin.models.entities.Product;
 import br.com.devxlabs.ravin.services.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,9 +59,14 @@ public class ProductController {
     }
 
     @PostMapping // /api/products
-    public void create(@Valid @RequestBody ProductDTO product) {// vai receber um JSON como parâmetro
-        System.out.println(product.toString());
+    public ResponseEntity<Object> create(@Valid @RequestBody ProductDTO product) {// vai receber um JSON como parâmetro
         //notação @Valid valida se o JSON passado esta formatado da forma correta
+
+        try {
+            return ResponseEntity.ok(service.create(product));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping(value = "/{id}")// "/api/products/13"
@@ -67,8 +74,26 @@ public class ProductController {
         System.out.println(product.toString());          // internamente o Spring converte em objeto Java
 
     //notação @Valid valida se o JSON passado esta formatado da forma correta
-    }
 
+        ProductDTO existingProduct = service.findById(id);
+
+       // if (existingProduct == null) {
+         //   return ResponseEntity.notFound().build();
+        //}
+
+        //try {
+            // Copie os atributos do productDTO para o existingProduct usando o BeanUtils
+         // BeanUtils.copyProperties(existingProduct, productDTO);
+        //} catch (Exception e) {
+            // Lidar com exceções, se ocorrerem
+           // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                 //   .body("Erro ao copiar os atributos do DTO para o Produto.");
+       // }
+
+        // Salve a atualização no banco de dados
+        //productService.save(existingProduct);
+
+    }
 
 
 }
