@@ -70,29 +70,25 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{id}")// "/api/products/13"
-    public void update(@Valid @RequestBody ProductDTO product, @PathVariable Integer id) {// vai receber um JSON como parâmetro
-        System.out.println(product.toString());          // internamente o Spring converte em objeto Java
+    public ResponseEntity<Object> update(@Valid @RequestBody ProductDTO product, @PathVariable Integer id) {// vai receber um JSON como parâmetro
 
-    //notação @Valid valida se o JSON passado esta formatado da forma correta
+        //notação @Valid valida se o JSON passado esta formatado da forma correta
 
         ProductDTO existingProduct = service.findById(id);
 
-       // if (existingProduct == null) {
-         //   return ResponseEntity.notFound().build();
-        //}
+        if (existingProduct == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-        //try {
-            // Copie os atributos do productDTO para o existingProduct usando o BeanUtils
-         // BeanUtils.copyProperties(existingProduct, productDTO);
-        //} catch (Exception e) {
-            // Lidar com exceções, se ocorrerem
-           // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                 //   .body("Erro ao copiar os atributos do DTO para o Produto.");
-       // }
+        try {
+            // Copie os atributos de product para o existingProduct usando o BeanUtils
+            BeanUtils.copyProperties(product, existingProduct);
+            // Salve a atualização no banco de dados
+            return ResponseEntity.ok(service.update(existingProduct));
 
-        // Salve a atualização no banco de dados
-        //productService.save(existingProduct);
-
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 
