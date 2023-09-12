@@ -1,8 +1,15 @@
 package br.com.devxlabs.ravin.services;
 
-import static org.mockito.Mockito.when;
+
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+
+import static br.com.devxlabs.ravin.consts.ExceptionConsts.*;
+import static org.mockito.Mockito.*;
 
 import br.com.devxlabs.ravin.enums.ProductType;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -13,6 +20,8 @@ import br.com.devxlabs.ravin.models.dtos.ProductDTO;
 import br.com.devxlabs.ravin.models.entities.Product;
 
 import br.com.devxlabs.ravin.repositories.ProductRepository;
+
+import java.util.Date;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductServiceTest {
@@ -26,10 +35,41 @@ public class ProductServiceTest {
     @InjectMocks
     ProductService productService;
 
-    public void save_ShouldSave() {
+    @Test
+    public void save_ShouldSave() throws Exception {
+        // Arrange
         Product product = createProduct();
+        Long createdProductId = product.getId();
         Product createdProduct = createProduct();
+        ProductDTO productDTO = createProductDTO();
+        when(mapper.map(productDTO, Product.class)).thenReturn(product);
         when(productRepository.save(product)).thenReturn(createdProduct);
+
+        // Act
+        Long id = productService.save(productDTO);
+
+        // Assert
+        verify(mapper).map(productDTO, Product.class);
+        verify(productRepository, times(1)).save(product);
+        assertThat(id).isEqualTo(createdProductId);
+    }
+
+    @Test
+    public void save_ShouldntSave() {
+        // Arrange
+        Product product = createProduct();
+        ProductDTO productDTO = createProductDTO();
+        when(mapper.map(productDTO, Product.class)).thenReturn(product);
+        when(productRepository.save(product)).thenThrow(new IllegalAccessException());
+
+        // Act
+        //Throwable exception = catch
+        //Throwable exception = catch
+
+        // Assert
+        verify(mapper).map(productDTO, Product.class);
+        verify(productRepository).save(product);
+        //assertThat(id).isEqualTo(createdProductId);
     }
 
     public ProductDTO createProductDTO() {
@@ -40,10 +80,9 @@ public class ProductServiceTest {
     }
 
     public Product createProduct() {
-//		Product product = new Product(1L, "Hamburguer", "Veggie", "8df98", 12.9, 20.5, "10 minutos", "",
-//				ProductType.SNACK, true, new Date(), "", new Date(),"");
-//		return product;
-        return null;
+		Product product = new Product(1, "Hamburguer", "Veggie", "8df98", 12.9, 20.5, "10 minutos", "",
+				ProductType.SNACK, true, "", new Date(), "",new Date());
+		return product;
     }
 
 }
