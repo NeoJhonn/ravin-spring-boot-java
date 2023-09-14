@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 import static br.com.devxlabs.ravin.consts.ExceptionConsts.*;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
 import br.com.devxlabs.ravin.enums.ProductType;
@@ -60,16 +61,13 @@ public class ProductServiceTest {
         Product product = createProduct();
         ProductDTO productDTO = createProductDTO();
         when(mapper.map(productDTO, Product.class)).thenReturn(product);
-        when(productRepository.save(product)).thenThrow(new IllegalAccessException());
+        when(productRepository.save(product)).thenThrow(new IllegalArgumentException());
 
         // Act
-        //Throwable exception = catch
-        //Throwable exception = catch
+        Throwable exception = catchThrowable(() -> productService.save(productDTO));
 
-        // Assert
-        verify(mapper).map(productDTO, Product.class);
-        verify(productRepository).save(product);
-        //assertThat(id).isEqualTo(createdProductId);
+        // Asserts
+        assertThat(exception.getMessage()).isEqualTo(PRODUCT_INSERT_ERROR);
     }
 
     public ProductDTO createProductDTO() {

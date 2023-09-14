@@ -3,6 +3,10 @@ package br.com.devxlabs.ravin.controllers;
 import br.com.devxlabs.ravin.models.dtos.ProductDTO;
 import br.com.devxlabs.ravin.models.entities.Product;
 import br.com.devxlabs.ravin.services.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +19,27 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/products")
+@Tag(name = "Produto", description = "Endpoints relacionados ao produto") // customizando UI do Swagger
 public class ProductController {
 
     @Autowired//intância por debaixo dos panos o service
     ProductService service;
 
+
+    @Operation(description = "Lista todos os produtos existentes", method = "GET")// customizando UI do Swagger
+    @ApiResponses(value = {// customizando UI do Swagger
+            @ApiResponse(responseCode = "200", description = "Lista com todos os produtos") })// customizando UI do Swagger
     @GetMapping("/list-all")// "/api/products/list-all"
     public List<ProductDTO> listAll() {
         return service.listAll();
     }
 
+    @Operation(description = "Busca um produto pelo id", method = "GET")// customizando UI do Swagger
+    @ApiResponses(// customizando UI do Swagger
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Retorna o produto encontrado com determinado id"),// customizando UI do Swagger
+                    @ApiResponse(responseCode = "404", description = "Nenhum produto encontrado com o id especificado")// customizando UI do Swagger
+            })
     @GetMapping(value = "/{id}") // "/api/products/1"
     public ResponseEntity<ProductDTO> findById(@PathVariable int id) {// @PathVariable indica o campo do caminho da api entre {id}
         ProductDTO product = service.findById(id);
